@@ -1,0 +1,17 @@
+{
+  "dependencies": {
+    "express": "^4.18.2",
+    "mysql": "^2.18.1",
+    "node": "^21.6.2",
+    "xss": "^1.0.14"
+  },
+  "name": "expressmysql",
+  "version": "1.0.0",
+  "main": "baza.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

@@ -1,5 +1,6 @@
 const express = require("express");
 const mysql = require("mysql");
+const xss = require("xss");
 var conn = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -13,9 +14,9 @@ conn.connect();
 
 app.use(express.json());
 
-app.get("/:name/:address", (req, res) => {
-  let imie = req.params["name"];
-  let adres = req.params["address"];
+app.get("/add", (req, res) => {
+  let imie = req.query["name"];
+  let adres = req.query["address"];
 
   let sql =
     "INSERT INTO customers (name,address) VALUES ('" +
@@ -44,36 +45,43 @@ app.post("/delete", (req, res) => {
   });
 });
 
+app.get("/submit", (req, res) => {
+  let userInput = req.query["name"];
+  const sanitizedInput = xss(userInput);
+  res.send(`Hello ${sanitizedInput}!`);
+});
+
 app.post("/", (req, res) => {
   let data = req.body;
+  let name = data.name;
+  let address = data.address;
 
-  let sql = `SELECT * FROM customers WHERE id = 1`;
+  let sql = "SELECT * FROM customers WHERE name =? AND address=?";
 
-  conn.query(sql, function (err, result) {
+  conn.query(sql, [name, address], function (err, result) {
     if (err) throw err;
     res.json(result);
   });
 });
 
 app.get("/cha", (req, res) => {
-  let imie = req.query.name;
-  let adres = req.query.address;
+  let imie = req.query["name"];
+  let adres = req.query["address"];
 
-  let sql =
-    "SELECT * FROM customers WHERE name = '" +
-    imie +
-    "' AND address = '" +
-    adres +
-    "'";
+  let sql = "SELECT * FROM customers WHERE address =?";
   conn.query(sql, function (err, result) {
     if (err) throw err;
-    res.send(result[0].name);
+    res.send(result[0].name + " " + result[0].address);
   });
 });
 
 app.get("/test", (req, res) => {
   let nazwa = req.query["nazwa"];
   res.send(nazwa);
+});
+
+app.get("/download", (req, res) => {
+  res.download(__dirname + "/smietnik.txt");
 });
 
 app.listen(3000, () => {
